@@ -2,6 +2,7 @@
 
 import { UserProfile } from "@/app/profile/page";
 import ChatHeader from "@/components/ChatHeader";
+import StreamChatInterface from "@/components/StreamChatInterface";
 // import StreamChatInterface from "@/components/StreamChatInterface";
 import { useAuth } from "@/contexts/auth-context";
 import { getUserMatches } from "@/lib/actions/matches";
@@ -92,9 +93,9 @@ export default function ChatConversationPage() {
           }}
         />
 
-        {/* <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0">
           <StreamChatInterface otherUser={otherUser} ref={chatInterfaceRef} />
-        </div> */}
+        </div>
       </div>
     </div>
   );

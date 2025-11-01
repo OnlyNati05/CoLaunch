@@ -5,11 +5,13 @@ import { getUserMatches } from "@/lib/actions/matches";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
-
+import { useRouter } from "next/navigation";
 export default function MatchesListPage() {
   const [matches, setMatches] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     async function loadMatches() {
@@ -18,7 +20,11 @@ export default function MatchesListPage() {
         setMatches(userMatches);
         console.log(userMatches);
       } catch (error) {
-        setError("Failed to load matches.");
+        if (error instanceof Error && error.message === "Not authenticated.") {
+          router.push("/auth");
+        } else {
+          setError("Failed to load matches.");
+        }
       } finally {
         setLoading(false);
       }
@@ -41,9 +47,9 @@ export default function MatchesListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
       <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
+        <header className="text-center mb-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Your Matches
           </h1>

@@ -4,6 +4,7 @@ import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
+import { useRouter } from "next/navigation";
 
 export interface UserProfile {
   id: string;
@@ -38,6 +39,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -45,11 +48,16 @@ export default function ProfilePage() {
         if (profileData) {
           setProfile(profileData);
         } else {
+          router.push("/auth");
           setError("Failed to load profile");
         }
-      } catch (err) {
-        console.error("Error loading profile: ", err);
-        setError("Failed to load profile");
+      } catch (error) {
+        if (error instanceof Error && error.message === "Not authenticated.") {
+          router.push("/auth");
+        } else {
+          console.error("Error loading profile: ", error);
+          setError("Failed to load profile");
+        }
       } finally {
         setLoading(false);
       }

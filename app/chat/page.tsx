@@ -4,6 +4,7 @@ import { getUserMatches } from "@/lib/actions/matches";
 import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ChatData {
   id: string;
@@ -16,6 +17,8 @@ interface ChatData {
 export default function ChatPage() {
   const [chats, setChats] = useState<ChatData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
 
   useEffect(() => {
     async function loadMatches() {
@@ -31,7 +34,11 @@ export default function ChatPage() {
         setChats(chatData);
         console.log(userMatches);
       } catch (error) {
-        console.error(error);
+        if (error instanceof Error && error.message === "Not authenticated.") {
+          router.push("/auth");
+        } else {
+          console.error(error);
+        }
       } finally {
         setLoading(false);
       }
@@ -73,7 +80,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
