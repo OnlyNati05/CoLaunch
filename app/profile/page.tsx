@@ -180,7 +180,7 @@ export default function ProfilePage() {
 
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      Dating Preferences
+                      Co-Founder Preferences
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>

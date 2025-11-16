@@ -82,8 +82,8 @@ export default function MatchesPage() {
     return (
       <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-24 h-24 bg-linear-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-4xl">💕</span>
+          <div className="w-24 h-24 bg-linear-to-r from-purple-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl">🤝</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             No more profiles to show
