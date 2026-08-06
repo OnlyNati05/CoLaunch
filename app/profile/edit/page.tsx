@@ -1,5 +1,6 @@
 "use client";
 
+import PageLoader from "@/components/PageLoader";
 import PhotoUpload from "@/components/PhotoUpload";
 import {
   getCurrentUserProfile,
@@ -68,7 +69,7 @@ export default function EditProfilePage() {
   function handleInputChange(
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -78,16 +79,7 @@ export default function EditProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading profile...
-          </p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import MatchCard from "@/components/MatchCard";
 import MatchButtons from "@/components/MatchButtons";
 import MatchNotification from "@/components/MatchNotification";
+import PageLoader from "@/components/PageLoader";
 
 export default function MatchesPage() {
   const [potentialMatches, setPotentialMatches] = useState<UserProfile[]>([]);
@@ -19,22 +20,25 @@ export default function MatchesPage() {
 
   useEffect(() => {
     async function loadUsers() {
+      let redirecting = false;
+
       try {
         const potentialMatchesData = await getPotentialMatches();
         setPotentialMatches(potentialMatchesData);
       } catch (error) {
         if (error instanceof Error && error.message === "Not authenticated.") {
-          router.push("/auth");
+          redirecting = true;
+          router.replace("/auth");
         } else {
           console.error(error);
         }
       } finally {
-        setLoading(false);
+        if (!redirecting) setLoading(false);
       }
     }
 
     loadUsers();
-  }, []);
+  }, [router]);
 
   async function handleLike() {
     if (currentIndex < potentialMatches.length) {
@@ -67,20 +71,16 @@ export default function MatchesPage() {
 
   if (loading) {
     return (
-      <div className="h-full bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Finding your matches...
-          </p>
-        </div>
-      </div>
+      <PageLoader
+        message="Finding your best matches"
+        description="Comparing skills, goals, and working styles."
+      />
     );
   }
 
   if (currentIndex >= potentialMatches.length) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center bg-[#080b16] px-4 pb-10 pt-28">
         <div className="text-center max-w-md mx-auto p-8">
           <div className="w-24 h-24 bg-linear-to-r from-purple-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-4xl">🤝</span>
@@ -112,7 +112,7 @@ export default function MatchesPage() {
   const currentPotentialMatch = potentialMatches[currentIndex];
 
   return (
-    <div className="h-full overflow-y-auto bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <main className="min-h-dvh overflow-y-auto bg-[#080b16] pb-10 pt-24 text-white">
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -163,6 +163,6 @@ export default function MatchesPage() {
           />
         )}
       </div>
-    </div>
+    </main>
   );
 }

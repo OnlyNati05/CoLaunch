@@ -3,221 +3,289 @@
 import { useAuth } from "@/contexts/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Zap, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
+import PageLoader from "@/components/PageLoader";
 
 export default function AuthPage() {
-  const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (user && !authLoading) {
-      router.push("/");
+      router.replace("/");
     }
   }, [user, authLoading, router]);
 
-  async function handleAuth(e: React.FormEvent) {
-    e.preventDefault();
-
+  async function handleAuth(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setLoading(true);
     setError("");
 
     try {
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
         if (data.user && !data.session) {
-          setError("Please check your email for a confirmation link");
+          setError(
+            "Check your inbox to confirm your email, then come back to sign in.",
+          );
           return;
         }
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        if (signInError) throw signInError;
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (caughtError: unknown) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   }
 
+  function toggleMode() {
+    setIsSignUp((current) => !current);
+    setError("");
+  }
+
+  if (authLoading || user) {
+    return (
+      <PageLoader
+        message={user ? "Taking you to CoLaunch" : "Checking your session"}
+        description="Making sure your account is ready."
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center mt-10 bg-purple-950 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-40 -right-20 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-20 left-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    <main className="min-h-screen bg-[#080b16] px-4 pb-8 pt-24 text-white sm:px-6 sm:pb-12 sm:pt-28">
+      <div className="mx-auto grid min-h-[calc(100vh-8.5rem)] max-w-6xl overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900 shadow-2xl shadow-black/30 lg:grid-cols-[.9fr_1.1fr]">
+        <aside className="relative hidden overflow-hidden bg-violet-600 p-10 lg:flex lg:flex-col lg:justify-between xl:p-14">
+          <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full border-[34px] border-violet-500" />
+          <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full border-[42px] border-blue-500/40" />
 
-        {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] bg-size-[100px_100px] mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
-      </div>
+          <div className="relative">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-violet-700">
+                <Zap className="h-6 w-6" fill="currentColor" />
+              </span>
+              <span className="text-xl font-bold">CoLaunch</span>
+            </Link>
 
-      <div className="relative max-w-md w-full mx-4">
-        {/* Card */}
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-10">
-          {/* Logo and Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-linear-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center transform hover:scale-110 hover:rotate-6 transition-all duration-300">
-                <Zap className="w-8 h-8 text-white" fill="white" />
-              </div>
+            <div className="mt-15">
+              <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-[-0.035em] xl:text-5xl">
+                Big ideas are better with the right person beside you.
+              </h1>
+              <p className="mt-5 max-w-md text-lg leading-8 text-violet-100">
+                Join a focused community of ambitious people ready to turn ideas
+                into companies.
+              </p>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              {isSignUp ? "Join CoLaunch" : "Welcome Back"}
-            </h1>
-            <p className="text-gray-400">
-              {isSignUp
-                ? "Create your account to start connecting"
-                : "Sign in to continue your journey"}
-            </p>
           </div>
 
-          {/* Form */}
-          <div className="space-y-5">
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-gray-300 mb-2"
-              >
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="you@example.com"
-                />
+          <div className="relative mt-12 rounded-2xl bg-violet-700 p-5">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((profileNumber) => (
+                  <Image
+                    key={profileNumber}
+                    src={`/profile_images/pfp${profileNumber}.jpg`}
+                    alt={`CoLaunch community member ${profileNumber}`}
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 rounded-full border-2 border-violet-700 object-cover"
+                  />
+                ))}
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Built for builders</p>
+                <p className="mt-0.5 text-xs text-violet-200">
+                  Find your missing piece.
+                </p>
               </div>
             </div>
+          </div>
+        </aside>
 
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-gray-300 mb-2"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-500" />
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleAuth(e as any);
-                    }
-                  }}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your password"
-                />
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-start space-x-2 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-                <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-400">{error}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              onClick={handleAuth}
-              disabled={loading}
-              className="group relative w-full flex cursor-pointer items-center justify-center py-4 px-6 bg-purple-500 text-white text-base font-bold rounded-xl transition-all duration-500 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        <section className="relative flex items-center justify-center bg-[#0c101d] px-5 py-10 sm:px-10 lg:px-14 xl:px-20">
+          <div className="w-full max-w-md">
+            <Link
+              href="/"
+              className="mb-9 inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-white lg:absolute lg:right-8 lg:top-8 lg:mb-0"
             >
-              <span className="flex items-center">
+              <ArrowLeft className="h-4 w-4" />
+              Back to home
+            </Link>
+
+            <div className="mb-8 lg:hidden">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600">
+                <Zap className="h-6 w-6" fill="currentColor" />
+              </span>
+            </div>
+
+            <div className="mb-8">
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                {isSignUp
+                  ? "Start your founder journey"
+                  : "Sign in to CoLaunch"}
+              </h2>
+              <p className="mt-3 leading-7 text-slate-400">
+                {isSignUp
+                  ? "Create a free account and meet people who are ready to build."
+                  : "Pick up where you left off and keep building momentum."}
+              </p>
+            </div>
+
+            <form onSubmit={handleAuth} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  Email address
+                </label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="block min-h-14 w-full rounded-xl border border-slate-700 bg-slate-900 py-3.5 pl-12 pr-4 text-white outline-none transition placeholder:text-slate-600 hover:border-slate-600 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                    placeholder="you@company.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-semibold text-slate-200"
+                  >
+                    Password
+                  </label>
+                  {!isSignUp && (
+                    <span className="text-xs font-medium text-slate-500">
+                      At least 6 characters
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={
+                      isSignUp ? "new-password" : "current-password"
+                    }
+                    minLength={6}
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="block min-h-14 w-full rounded-xl border border-slate-700 bg-slate-900 py-3.5 pl-12 pr-12 text-white outline-none transition placeholder:text-slate-600 hover:border-slate-600 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((current) => !current)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-200"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4"
+                >
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+                  <p className="text-sm leading-6 text-red-300">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="group flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 text-base font-bold text-white shadow-[0_10px_30px_rgba(124,58,237,0.2)] transition hover:-translate-y-0.5 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-[#0c101d] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Processing...
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    {isSignUp ? "Creating account..." : "Signing in..."}
                   </>
                 ) : (
                   <>
-                    {isSignUp ? "Create Account" : "Sign In"}
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {isSignUp ? "Create free account" : "Sign in"}
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
+              </button>
+            </form>
+
+            <div className="mt-7 flex items-center justify-center gap-1.5 text-sm">
+              <span className="text-slate-400">
+                {isSignUp ? "Already have an account?" : "New to CoLaunch?"}
               </span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="font-semibold text-violet-400 transition hover:text-violet-300"
+              >
+                {isSignUp ? "Sign in" : "Create an account"}
+              </button>
+            </div>
 
-          {/* Toggle Sign In/Up */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-400 text-sm mb-2">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}
+            <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500">
+              <ShieldCheck className="h-4 w-4 text-blue-400" />
+              Your information stays private and secure.
             </p>
-            <button
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError("");
-              }}
-              className="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-200"
-            >
-              {isSignUp ? "Sign in instead" : "Create a free account"}
-            </button>
           </div>
-        </div>
+        </section>
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          25% {
-            transform: translate(40px, -60px) scale(1.1);
-          }
-          50% {
-            transform: translate(-40px, 40px) scale(0.9);
-          }
-          75% {
-            transform: translate(60px, 60px) scale(1.05);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 10s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
-    </div>
+    </main>
   );
 }

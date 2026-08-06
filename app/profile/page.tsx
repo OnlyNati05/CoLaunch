@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import { useRouter } from "next/navigation";
+import PageLoader from "@/components/PageLoader";
 
 export interface UserProfile {
   id: string;
@@ -43,40 +44,34 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadProfile() {
+      let redirecting = false;
+
       try {
         const profileData = await getCurrentUserProfile();
         if (profileData) {
           setProfile(profileData);
         } else {
-          router.push("/auth");
-          setError("Failed to load profile");
+          redirecting = true;
+          router.replace("/auth");
         }
       } catch (error) {
         if (error instanceof Error && error.message === "Not authenticated.") {
-          router.push("/auth");
+          redirecting = true;
+          router.replace("/auth");
         } else {
           console.error("Error loading profile: ", error);
           setError("Failed to load profile");
         }
       } finally {
-        setLoading(false);
+        if (!redirecting) setLoading(false);
       }
     }
 
     loadProfile();
-  }, []);
+  }, [router]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading your profile...
-          </p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (error || !profile) {

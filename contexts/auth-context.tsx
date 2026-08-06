@@ -14,10 +14,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const supabase = createClient();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [supabase] = useState(createClient);
 
   useEffect(() => {
+    let subscription: ReturnType<
+      typeof supabase.auth.onAuthStateChange
+    >["data"]["subscription"] | null = null;
+
     async function checkUser() {
       try {
         const {
@@ -25,13 +29,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = await supabase.auth.getSession();
 
         setUser(session?.user ?? null);
-        const {
-          data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data } = supabase.auth.onAuthStateChange((_event, session) => {
           setUser(session?.user ?? null);
         });
-
-        return () => subscription.unsubscribe();
+        subscription = data.subscription;
       } catch (err) {
         console.error(err);
       } finally {
@@ -39,7 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     checkUser();
-  }, []);
+
+    return () => subscription?.unsubscribe();
+  }, [supabase]);
 
   async function signOut() {
     try {

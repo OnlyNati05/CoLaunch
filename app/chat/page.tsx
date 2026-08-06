@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PageLoader from "@/components/PageLoader";
 
 interface ChatData {
   id: string;
@@ -22,6 +23,8 @@ export default function ChatPage() {
 
   useEffect(() => {
     async function loadMatches() {
+      let redirecting = false;
+
       try {
         const userMatches = await getUserMatches();
         const chatData: ChatData[] = userMatches.map((match) => ({
@@ -35,17 +38,18 @@ export default function ChatPage() {
         console.log(userMatches);
       } catch (error) {
         if (error instanceof Error && error.message === "Not authenticated.") {
-          router.push("/auth");
+          redirecting = true;
+          router.replace("/auth");
         } else {
           console.error(error);
         }
       } finally {
-        setLoading(false);
+        if (!redirecting) setLoading(false);
       }
     }
 
     loadMatches();
-  }, []);
+  }, [router]);
 
   function formatTime(timestamp: string) {
     const date = new Date(timestamp);
@@ -67,16 +71,7 @@ export default function ChatPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading your matches...
-          </p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

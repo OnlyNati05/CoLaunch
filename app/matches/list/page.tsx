@@ -6,43 +6,42 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import { useRouter } from "next/navigation";
+import PageLoader from "@/components/PageLoader";
 export default function MatchesListPage() {
   const [matches, setMatches] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
     async function loadMatches() {
+      let redirecting = false;
+
       try {
         const userMatches = await getUserMatches();
         setMatches(userMatches);
         console.log(userMatches);
       } catch (error) {
         if (error instanceof Error && error.message === "Not authenticated.") {
-          router.push("/auth");
+          redirecting = true;
+          router.replace("/auth");
         } else {
-          setError("Failed to load matches.");
+          console.error("Failed to load matches.", error);
         }
       } finally {
-        setLoading(false);
+        if (!redirecting) setLoading(false);
       }
     }
 
     loadMatches();
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading your matches...
-          </p>
-        </div>
-      </div>
+      <PageLoader
+        message="Loading your connections"
+        description="Bringing your founder matches together."
+      />
     );
   }
 
