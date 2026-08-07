@@ -75,13 +75,23 @@ export async function likeUser(toUserId: string) {
     throw new Error("Not authenticated.");
   }
 
-  const { error: likeError } = await supabase.from("likes").insert({
+  const { error } = await supabase.from("likes").insert({
     from_user_id: user.id,
     to_user_id: toUserId,
   });
 
-  if (likeError) {
-    throw new Error("Failed to create like");
+  if (error) {
+    console.error("Supabase query failed", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
+
+    throw new Error(
+      `Failed to fetch potential matches: ${error.message} (${error.code})`,
+      { cause: error },
+    );
   }
 
   const { data: existingLike, error: checkError } = await supabase

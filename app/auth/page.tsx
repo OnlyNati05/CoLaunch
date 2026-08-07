@@ -150,12 +150,6 @@ export default function AuthPage() {
               Back to home
             </Link>
 
-            <div className="mb-8 lg:hidden">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600">
-                <Zap className="h-6 w-6" fill="currentColor" />
-              </span>
-            </div>
-
             <div className="mb-8">
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                 {isSignUp

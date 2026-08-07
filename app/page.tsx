@@ -63,6 +63,14 @@ export default function Home() {
         {/* <DotPattern glow={true} width={32} height={32} /> */}
 
         <section className="relative isolate overflow-hidden px-5 pb-20 pt-32 sm:px-8 lg:pb-32 lg:pt-40">
+          <div
+            className="pointer-events-none absolute -left-32 top-36 h-[30rem] w-[30rem] rounded-full bg-violet-600/10 blur-[120px]"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -right-40 top-16 h-[34rem] w-[34rem] rounded-full bg-blue-600/[0.08] blur-[140px]"
+            aria-hidden="true"
+          />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-linear-to-b from-transparent to-[#080b16]" />
 
           <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.05fr_.95fr] lg:gap-12">
@@ -111,7 +119,7 @@ export default function Home() {
                 >
                   <a
                     href={primaryHref}
-                    className="group inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-violet-600 px-7 text-base font-semibold text-white shadow-[0_10px_30px_rgba(124,58,237,0.25)] transition hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-[#080b16]"
+                    className="group inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-violet-600 px-7 text-base font-semibold text-white shadow-[0_10px_30px_rgba(124,58,237,0.25)] transition hover:bg-violet-500 focus:outline-none focus:ring-2 duration-300 focus:ring-offset-2 focus:ring-offset-[#080b16]"
                   >
                     {primaryLabel}
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -231,13 +239,33 @@ export default function Home() {
         <section className="px-5 py-20 sm:px-8 lg:py-28">
           <div className="mx-auto max-w-7xl">
             <div>
-              <h2 className="my-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
-                From searching to building, faster.
-              </h2>
-              <p className="max-w-md text-base leading-7 text-slate-400">
-                CoLaunch turns co-founder discovery into a simple, human process
-                built around compatibility.
-              </p>
+              <motion.section
+                initial={{ opacity: 0, filter: "blur(2px)", y: 20 }}
+                whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{
+                  duration: 0.8,
+                  ease: [0.16, 0.7, 0.3, 1],
+                }}
+              >
+                <h2 className="my-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
+                  From searching to building, faster.
+                </h2>
+              </motion.section>
+              <motion.section
+                initial={{ opacity: 0, filter: "blur(2px)", y: 20 }}
+                whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{
+                  duration: 0.8,
+                  ease: [0.16, 0.7, 0.3, 1],
+                }}
+              >
+                <p className="max-w-md text-base leading-7 text-slate-400">
+                  CoLaunch turns co-founder discovery into a simple, human
+                  process built around compatibility.
+                </p>
+              </motion.section>
             </div>
 
             <div className="mt-12 grid gap-4 md:grid-cols-3">
@@ -245,52 +273,73 @@ export default function Home() {
                 const Icon = feature.icon;
                 const isBlue = feature.accent === "blue";
                 return (
-                  <article
-                    key={feature.title}
-                    className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-7 transition hover:-translate-y-1 hover:border-slate-600 sm:p-8"
+                  <motion.section
+                    key={index}
+                    initial={{ opacity: 0, filter: "blur(2px)", y: 20 }}
+                    whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{
+                      duration: 0.8,
+                      ease: [0.16, 0.7, 0.3, 1],
+                      delay: 0.2 * index,
+                    }}
                   >
-                    <span className="absolute right-6 top-5 text-5xl font-bold text-slate-800">
-                      0{index + 1}
-                    </span>
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl ${isBlue ? "bg-blue-600" : "bg-violet-600"}`}
+                    <article
+                      key={feature.title}
+                      className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-7 transition hover:-translate-y-1 hover:border-slate-600 sm:p-8"
                     >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="mt-8 text-xl font-semibold">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-3 leading-7 text-slate-400">
-                      {feature.description}
-                    </p>
-                    <a
-                      href={primaryHref}
-                      className={`mt-6 inline-flex items-center gap-1 text-sm font-semibold ${isBlue ? "text-blue-400" : "text-violet-400"}`}
-                    >
-                      Learn more{" "}
-                      <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </article>
+                      <span className="absolute right-6 top-5 text-5xl font-bold text-slate-800">
+                        0{index + 1}
+                      </span>
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-xl ${isBlue ? "bg-blue-600" : "bg-violet-600"}`}
+                      >
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <h3 className="mt-8 text-xl font-semibold">
+                        {feature.title}
+                      </h3>
+                      <p className="mt-3 leading-7 text-slate-400">
+                        {feature.description}
+                      </p>
+                      <a
+                        href={primaryHref}
+                        className={`mt-6 inline-flex items-center gap-1 text-sm font-semibold ${isBlue ? "text-blue-400" : "text-violet-400"}`}
+                      >
+                        Learn more{" "}
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </article>
+                  </motion.section>
                 );
               })}
             </div>
-
-            <div className="mt-16 overflow-hidden rounded-3xl bg-violet-600 px-6 py-12 sm:px-12 lg:flex lg:items-center lg:justify-between lg:px-16">
-              <div className="max-w-2xl">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-violet-200">
-                  Your company starts here
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                  Meet the person who makes the idea possible.
-                </h2>
+            <motion.section
+              initial={{ opacity: 0, filter: "blur(2px)", y: 20 }}
+              whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{
+                duration: 0.8,
+                ease: [0.16, 0.7, 0.3, 1],
+              }}
+            >
+              <div className="mt-16 overflow-hidden rounded-3xl bg-violet-600 px-6 py-12 sm:px-12 lg:flex lg:items-center lg:justify-between lg:px-16">
+                <div className="max-w-2xl">
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-violet-200">
+                    Your company starts here
+                  </p>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                    Meet the person who makes the idea possible.
+                  </h2>
+                </div>
+                <a
+                  href={primaryHref}
+                  className="mt-7 inline-flex min-h-13 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 font-semibold text-violet-700 transition hover:bg-violet-50 lg:mt-0"
+                >
+                  {primaryLabel} <ArrowRight className="h-5 w-5" />
+                </a>
               </div>
-              <a
-                href={primaryHref}
-                className="mt-7 inline-flex min-h-13 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 font-semibold text-violet-700 transition hover:bg-violet-50 lg:mt-0"
-              >
-                {primaryLabel} <ArrowRight className="h-5 w-5" />
-              </a>
-            </div>
+            </motion.section>
           </div>
         </section>
       </main>
