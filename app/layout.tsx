@@ -47,7 +47,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CoLaunch — Find Your Co-Founder",
+  title: "CoLaunch",
   description:
     "Meet ambitious builders with complementary skills and find the right co-founder for your next company.",
 };

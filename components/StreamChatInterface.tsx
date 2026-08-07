@@ -30,8 +30,6 @@ export default function StreamChatInterface({
   otherUser: UserProfile;
   ref: RefObject<{ handleVideoCall: () => void } | null>;
 }) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
@@ -92,7 +90,6 @@ export default function StreamChatInterface({
 
     async function initializeChat() {
       try {
-        setError(null);
 
         const { token, userId, userName, userImage } =
           await getStreamUserToken();
@@ -136,10 +133,14 @@ export default function StreamChatInterface({
         chatChannel.on("message.new", (event: Event) => {
           if (event.message) {
             if (event.message.text?.includes(`📹 Video call invitation`)) {
-              const customData = event.message as any;
+              const customData = event.message as typeof event.message & {
+                caller_id?: string;
+                call_id?: string;
+                caller_name?: string;
+              };
 
               if (customData.caller_id !== userId) {
-                setIncomingCallId(customData.call_id);
+                setIncomingCallId(customData.call_id ?? "");
                 setCallerName(customData.caller_name || "Someone");
                 setIncomingCall(true);
               }
@@ -185,7 +186,6 @@ export default function StreamChatInterface({
         router.push("/chat");
         console.log(error);
       } finally {
-        setLoading(false);
       }
     }
 
@@ -289,10 +289,10 @@ export default function StreamChatInterface({
 
   if (!client || !channel) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="flex flex-1 items-center justify-center bg-[#0c101d] text-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-slate-700 border-t-violet-500"></div>
+          <p className="mt-4 text-sm text-slate-400">
             Setting up chat...
           </p>
         </div>
@@ -301,10 +301,10 @@ export default function StreamChatInterface({
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+    <div className="relative flex h-full flex-col bg-[#0c101d] text-white">
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth chat-scrollbar relative"
+        className="chat-scrollbar relative flex-1 space-y-4 overflow-y-auto p-4 scroll-smooth sm:p-6"
         style={{ scrollBehavior: "smooth" }}
       >
         {messages.map((message, key) => (
@@ -315,18 +315,18 @@ export default function StreamChatInterface({
             }`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+              className={`max-w-[82%] rounded-2xl px-4 py-3 sm:max-w-md ${
                 message.sender === "me"
-                  ? "bg-linear-to-r from-pink-500 to-red-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
+                  ? "rounded-br-md bg-violet-600 text-white"
+                  : "rounded-bl-md border border-slate-700 bg-slate-800 text-slate-100"
               }`}
             >
               <p className="text-sm">{message.text}</p>
               <p
                 className={`text-xs mt-1 ${
                   message.sender === "me"
-                    ? "text-pink-100"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "text-violet-200"
+                    : "text-slate-500"
                 }`}
               >
                 {formatTime(message.timestamp)}
@@ -337,7 +337,7 @@ export default function StreamChatInterface({
 
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-2xl">
+            <div className="rounded-2xl rounded-bl-md border border-slate-700 bg-slate-800 px-4 py-3 text-white">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <div
@@ -360,7 +360,7 @@ export default function StreamChatInterface({
         <div className="absolute bottom-20 right-6 z-10">
           <button
             onClick={scrollToBottom}
-            className="bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            className="rounded-xl bg-violet-600 p-3 text-white shadow-lg transition hover:bg-violet-500"
             title="Scroll to bottom"
           >
             <svg
@@ -382,7 +382,7 @@ export default function StreamChatInterface({
 
       {/* Message Input */}
 
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="border-t border-slate-800 bg-slate-900 p-4">
         <form className="flex space-x-2" onSubmit={handleSendMessage}>
           <input
             type="text"
@@ -394,20 +394,20 @@ export default function StreamChatInterface({
                 channel.keystroke();
               }
             }}
-            onFocus={(e) => {
+            onFocus={() => {
               if (channel) {
                 channel.keystroke();
               }
             }}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+            className="min-h-12 flex-1 rounded-xl border border-slate-700 bg-[#0c101d] px-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
             disabled={!channel}
           />
 
           <button
             type="submit"
             disabled={!newMessage.trim() || !channel}
-            className="px-6 py-2 bg-linear-to-r from-pink-500 to-red-500 text-white rounded-full hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600 p-0 text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <svg
               className="w-5 h-5"
@@ -427,32 +427,32 @@ export default function StreamChatInterface({
       </div>
 
       {showIncomingCall && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm mx-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-4 border-pink-500">
+              <div className="mx-auto mb-4 h-20 w-20 overflow-hidden rounded-2xl border-2 border-violet-500">
                 <img
                   src={otherUser.avatar_url}
                   alt={otherUser.full_name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="mb-2 text-xl font-semibold text-white">
                 Incoming Video Call
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="mb-6 text-slate-400">
                 {callerName} is calling you
               </p>
               <div className="flex space-x-4">
                 <button
                   onClick={handleDeclineCall}
-                  className="flex-1 bg-red-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-red-600 transition-colors duration-200"
+                  className="flex-1 rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-3 font-semibold text-red-300 hover:bg-red-500/20"
                 >
                   Decline
                 </button>
                 <button
                   onClick={handleAcceptCall}
-                  className="flex-1 bg-green-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-green-600 transition-colors duration-200"
+                  className="flex-1 rounded-xl bg-violet-600 px-6 py-3 font-semibold text-white hover:bg-violet-500"
                 >
                   Accept
                 </button>

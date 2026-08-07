@@ -1,4 +1,4 @@
-import { Zap } from "lucide-react";
+import Image from "next/image";
 
 type PageLoaderProps = {
   message?: string;
@@ -24,8 +24,14 @@ export default function PageLoader({
         <div className="relative mb-8 flex h-24 w-24 items-center justify-center">
           <span className="absolute inset-0 animate-ping rounded-[1.75rem] border border-violet-500/25 [animation-duration:2s]" />
           <span className="absolute inset-2 rounded-3xl border border-slate-700 bg-slate-900" />
-          <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-600 shadow-[0_12px_35px_rgba(124,58,237,0.3)]">
-            <Zap className="h-7 w-7 text-white" fill="currentColor" />
+          <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl shadow-[0_12px_35px_rgba(124,58,237,0.3)] overflow-hidden">
+            <Image
+              src="/colaunch_logo.png"
+              alt=""
+              width={1254}
+              height={1254}
+              className="size-15 object-cover"
+            />
           </span>
         </div>
       </div>

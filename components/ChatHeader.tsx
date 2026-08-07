@@ -2,80 +2,19 @@
 
 import { UserProfile } from "@/app/profile/page";
 import { calculateAge } from "@/lib/helpers/calculate-age";
+import { ArrowLeft, BadgeCheck, Video } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface ChatHeaderProps {
-  user: UserProfile;
-  onVideoCall?: () => void;
-}
-export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
+export default function ChatHeader({ user, onVideoCall }: { user: UserProfile; onVideoCall?: () => void }) {
   const router = useRouter();
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-          >
-            <svg
-              className="w-6 h-6 text-gray-600 dark:text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <div className="flex items-center space-x-3">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden">
-              <img
-                src={user.avatar_url}
-                alt={user.full_name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {user.full_name}, {calculateAge(user.birthdate)}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                @{user.username}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={onVideoCall}
-            className="p-3 rounded-full bg-linear-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-            title="Start Video Call"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-          </button>
-        </div>
+    <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-900 px-4 py-4 sm:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <button onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-700 text-slate-400 transition hover:bg-slate-800 hover:text-white" aria-label="Back to messages"><ArrowLeft className="h-5 w-5" /></button>
+        <div className="relative shrink-0"><img src={user.avatar_url || "/default-avatar.png"} alt={user.full_name} className="h-11 w-11 rounded-xl object-cover sm:h-12 sm:w-12" /><span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-slate-900 ${user.is_online ? "bg-emerald-500" : "bg-slate-500"}`} /></div>
+        <div className="min-w-0"><div className="flex items-center gap-1.5"><h1 className="truncate font-semibold sm:text-lg">{user.full_name}, {calculateAge(user.birthdate)}</h1>{user.is_verified && <BadgeCheck className="h-4 w-4 shrink-0 text-blue-400" />}</div><p className="text-xs text-slate-500">{user.is_online ? "Online now" : `@${user.username}`}</p></div>
       </div>
-    </div>
+      <button onClick={onVideoCall} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white transition hover:bg-violet-500" title="Start video call" aria-label="Start video call"><Video className="h-5 w-5" /></button>
+    </header>
   );
 }

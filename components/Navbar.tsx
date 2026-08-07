@@ -2,6 +2,7 @@
 import { useAuth } from "@/contexts/auth-context";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import {
   Zap,
@@ -43,14 +44,21 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3 group">
-              <div className="relative">
+              <div className=" rounded-xl overflow-hidden ">
+                <Image
+                  src="/colaunch_logo.png"
+                  alt=""
+                  width={1254}
+                  height={1254}
+                  className="size-10 object-cover"
+                />
+              </div>
+              {/* <div className="relative">
                 <div className="relative w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all duration-300">
                   <Zap className="w-6 h-6 text-white" fill="white" />
                 </div>
-              </div>
-              <span className="text-2xl font-bold text-white transition-colors group-hover:text-violet-300">
-                CoLaunch
-              </span>
+              </div> */}
+              <span className="text-2xl font-bold text-white ">CoLaunch</span>
             </Link>
 
             {/* Desktop Nav Links */}
@@ -85,9 +93,6 @@ export default function Navbar() {
                       />
                       <span>{item.label}</span>
                     </span>
-                    {isActive && (
-                      <span className="absolute -bottom-3 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-violet-400"></span>
-                    )}
                   </a>
                 );
               })}

@@ -80,10 +80,7 @@ export default function AuthPage() {
 
   if (authLoading || user) {
     return (
-      <PageLoader
-        message={user ? "Taking you to CoLaunch" : "Checking your session"}
-        description="Making sure your account is ready."
-      />
+      <div className="min-h-dvh bg-[#080b16] px-5 pb-16 pt-28 text-white sm:px-8 lg:pt-32"></div>
     );
   }
 
@@ -96,9 +93,15 @@ export default function AuthPage() {
 
           <div className="relative">
             <Link href="/" className="inline-flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-violet-700">
-                <Zap className="h-6 w-6" fill="currentColor" />
-              </span>
+              <div className=" rounded-lg overflow-hidden ">
+                <Image
+                  src="/colaunch_logo_white.png"
+                  alt=""
+                  width={1254}
+                  height={1254}
+                  className="size-8 object-cover"
+                />
+              </div>
               <span className="text-xl font-bold">CoLaunch</span>
             </Link>
 
